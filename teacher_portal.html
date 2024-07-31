@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Portal</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Welcome, {{ user_info.name }}!</h2>
+        <h4>Your Feedback Data</h4>
+
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>Course Code</th>
+                    <th>Date of Feedback</th>
+                    <th>Week</th>
+                    <th>Understanding Rating</th>
+                    <th>Revision Rating</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for feedback in feedback_data %}
+                <tr>
+                    <td>{{ feedback[0] }}</td>
+                    <td>{{ feedback[1] }}</td>
+                    <td>{{ feedback[2] }}</td>
+                    <td>{{ feedback[3] }}</td>
+                    <td>{{ feedback[4] }}</td>
+                    <td>{{ feedback[5] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
