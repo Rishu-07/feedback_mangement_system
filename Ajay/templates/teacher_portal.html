@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Portal</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #dee2e6;
+            margin-bottom: 20px;
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 2rem;
+            color: #343a40;
+        }
+
+        .home-button {
+            background-color: #007bff;
+            border-radius: 8px;
+            border: none;
+            color: #ffffff;
+            cursor: pointer;
+            display: inline-block;
+            font-size: 16px;
+            font-weight: 500;
+            padding: 10px 20px;
+            text-decoration: none;
+            transition: background-color 200ms ease-in-out;
+        }
+
+        .home-button:hover {
+            background-color: #0056b3;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            color: #007bff;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+            font-size: 1.75rem;
+            color: #495057;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .table-container {
+            margin-bottom: 20px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .table th {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        .scrollable {
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+
+        .scrollable::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .scrollable::-webkit-scrollbar-thumb {
+            background-color: #007bff;
+            border-radius: 4px;
+        }
+
+        #ratingPieChartQ1, #ratingPieChartQ2 {
+            max-width: 300px;
+            max-height: 300px;
+            margin: 0 auto;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="header">
+        <h2>Teacher Portal</h2>
+        <a href="/" class="home-button">Home</a>
+    </div>
+
+    <h1>Welcome, {{ user_info['name'] }}</h1>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <h2>Remarks</h2>
+                <div class="scrollable">
+                    {% for row in feedback_data %}
+                    <p>{{ row[5] }}</p>
+                    <hr>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <h2>Last two week rating of question 1</h2>
+                        <canvas id="ratingPieChartQ1"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <h2>Last two week rating of question 2</h2>
+                        <canvas id="ratingPieChartQ2"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Course Code</th>
+                    <th>Date</th>
+                    <th>Week</th>
+                    <th>Q1 Rating</th>
+                    <th>Q2 Rating</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in feedback_data %}
+                <tr>
+                    <td>{{ row[0] }}</td>
+                    <td>{{ row[1] }}</td>
+                    <td>{{ row[2] or "N/A" }}</td>
+                    <td>{{ avg_question1_rating }}</td>
+                    <td>{{ avg_question2_rating }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const ctxQ1 = document.getElementById('ratingPieChartQ1').getContext('2d');
+        const ctxQ2 = document.getElementById('ratingPieChartQ2').getContext('2d');
+
+        fetch('/teacher_portal?data=json')
+            .then(response => response.json())
+            .then(data => {
+                const ratingPieDataQ1 = {
+                    labels: ['1', '2', '3', '4', '5'],
+                    datasets: [{
+                        label: 'Rating Distribution',
+                        data: Object.values(data.rating_distribution_q1),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                };
+
+                const ratingPieDataQ2 = {
+                    labels: ['1', '2', '3', '4', '5'],
+                    datasets: [{
+                        label: 'Rating Distribution',
+                        data: Object.values(data.rating_distribution_q2),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                };
+
+                new Chart(ctxQ1, {
+                    type: 'pie',
+                    data: ratingPieDataQ1,
+                    options: {
+                        aspectRatio: 1,
+                        plugins: {
+                            legend: {
+                                display: true
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        let students = context.raw;
+                                        let rating = context.label;
+                                        return `${students} students - ${rating} rating`;
+                                    },
+                                    title: function (context) {
+                                        return ''; // return an empty string to hide the default title
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                new Chart(ctxQ2, {
+                    type: 'pie',
+                    data: ratingPieDataQ2,
+                    options: {
+                        aspectRatio: 1,
+                        plugins: {
+                            legend: {
+                                display: true
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        let students = context.raw;
+                                        let rating = context.label;
+                                        return `${students} students - ${rating} rating`;
+                                    },
+                                    title: function (context) {
+                                        return ''; // return an empty string to hide the default title
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+    </script>
+</body>
+
+</html>

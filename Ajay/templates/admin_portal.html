@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Admin Portal</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Course Code</th>
+                <th>Instructor Email</th>
+                <th>Average Rating for Question 1</th>
+                <th>Average Rating for Question 2</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rating in ratings %}
+                <tr>
+                    <td>{{ rating.course_code }}</td>
+                    <td>{{ rating.instructor_email }}</td>
+                    <td>{{ rating.avg_q1_rating }}</td>
+                    <td>{{ rating.avg_q2_rating }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
